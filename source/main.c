@@ -30,6 +30,27 @@ entity_t pipes[PIPES_NO_ENTITIES];
 entity_t *entities[LEVEL_NO_ENITITES];
 
 
+#include <stdbool.h>
+
+
+bool check_collision(const entity_t *kirby, const entity_t *pipe)
+{
+    // written using ChatGPT: find closest point on rect to circle center
+	float x_closest = (kirby->x < pipe->x + pipe->rx) ? 
+					((kirby->x > pipe->x - pipe->rx) ? kirby->x : pipe->x - pipe->rx) 
+					: pipe->x + pipe->rx;
+	float y_closest = (kirby->y < pipe->y + pipe->ry) ? 
+					((kirby->y > pipe->y - pipe->ry) ? kirby->y : pipe->y - pipe->ry) 
+					: pipe->y + pipe->ry;
+
+    // Distance from circle center to this point
+    float dx = kirby->x - x_closest;
+    float dy = kirby->y - y_closest;
+
+    return (dx*dx + dy*dy) <= (KIRBY_COLLIDER_RADIUS*KIRBY_COLLIDER_RADIUS);
+}
+
+
 int main(void) 
 {
 	videoSetMode(MODE_5_3D);
@@ -70,13 +91,30 @@ int main(void)
 		g_frame++;
 		g_input = keysDown();
 
-		iprintf("\x1b[10;0Hframe = %d; %d; %d", g_frame, (int)pipes[0].x, (int)pipes[0].y);
+		iprintf("\x1b[10;0Hframe = %d; %d", g_frame, g_gamestate);
+
+		size_t pipe_collider_idx = 0;
 
 		// MENU is only triggered after a game over
 		if (g_gamestate != MENU) {
+			// update entities
 			kirby_update(&kirby);
 			pipes_update(pipes);
 			// env_update(env);
+			
+			// check collision
+			if (g_gamestate == PLAY) {
+				if (pipes[pipe_collider_idx].x < KIRBY_X-KIRBY_SPRITE_WIDTH) {
+					pipe_collider_idx = (pipe_collider_idx+2)%PIPES_NO_ENTITIES;
+				}
+				if (
+					check_collision(&kirby, &pipes[pipe_collider_idx]) ||
+					check_collision(&kirby, &pipes[pipe_collider_idx + 1])
+				) {
+					g_gamestate = OVER;
+				}
+			}
+
 	
 		} else {
 			// menu_update();

@@ -10,7 +10,6 @@
 
 #include "tx_kirby.h"
 
-#define KIRBY_SPRITE_WIDTH 32
 #define KIRBY_SPRITE_HEIGHT KIRBY_SPRITE_WIDTH
 
 #define KIRBY_NO_SPRITES 6
@@ -44,8 +43,8 @@ static const uint8_t kirby_animation[KIRBY_NO_FRAMES_ANIMATION] = {
 void kirby_init(entity_t *e)
 {
 	e->active = true;
-	e->x = SCREEN_WIDTH/3; 
-	e->y = SCREEN_HEIGHT/2;
+	e->x = KIRBY_X; 
+	e->y = KIRBY_Y;
 	e->vx = 0;
 	e->vy = 0;
 	e->rx = KIRBY_SPRITE_WIDTH/2;

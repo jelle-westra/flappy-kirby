@@ -7,7 +7,6 @@
 #define PIPE_WIDTH 32
 #define PIPE_HEIGHT 64
 
-
 void pipes_init(entity_t e[])
 {
     // TODO : load sprite
@@ -34,29 +33,31 @@ void pipes_init(entity_t e[])
 
 void pipes_update(entity_t e[])
 {
-    
     switch (g_gamestate)
     {
         case IDLE:
-            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
+            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
                 e[j].vx = 0.f;
+            }
             break;
         case PLAY:
-            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
+            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
                 e[j].vx = LEVEL_SPEED_FG;
+            }
             break;
         case OVER:
-            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
+            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
                 e[j].vx += LEVEL_SPEED_OVER_DECELLERATION;
+            }
             if (e[0].vx >= 0) g_gamestate = MENU;
             break;
     }
-    for (size_t i=0; i<PIPES_NO_COLS; i++) {
-        e[2*i    ].x += e[2*i    ].vx;
-        e[2*i + 1].x += e[2*i + 1].vx;
-        if (e[2*i].x < -PIPE_WIDTH/2) {
-            e[2*i    ].x += PIPES_NO_COLS*PIPES_OFFSET;
-            e[2*i + 1].x += PIPES_NO_COLS*PIPES_OFFSET;
+    for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
+        // update position of pipes column
+        e[j].x += e[j].vx;
+        // teleport to the back of the 
+        if (e[j].x < -PIPE_WIDTH/2) {
+            e[j].x += PIPES_NO_COLS*PIPES_OFFSET;
         }
     }
 }
