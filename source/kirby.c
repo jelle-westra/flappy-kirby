@@ -18,6 +18,10 @@
 
 #define KIRBY_GRAVITY .125f
 #define KIRBY_BOOST -2.6f
+#define KIRBY_BOUNCE_COEFFICIENT 0.6f
+
+#define KIRBY_MAX_HEIGHT 0.f
+#define KIRBY_MIN_HEIGHT SCREEN_HEIGHT - KIRBY_SPRITE_HEIGHT
 
 // u, v, width, height
 const unsigned int kirby_texcoords[] = {
@@ -77,32 +81,43 @@ static void kirby_jump(entity_t *e)
 }
 
 void kirby_update(entity_t *e)
-{
-	if (g_frame > 250) g_gamestate = OVER;
-
-	e->y += e->vy;
-	e->vy += KIRBY_GRAVITY;
-
+{	
 	// [Logic]
 	switch (g_gamestate)
 	{
-	case IDLE:
-		if (g_input&KIRBY_KEY_JUMP) {
-			g_gamestate=PLAY;
-			kirby_jump(e);
-		} else if (e->y > SCREEN_HEIGHT/2) {
-			kirby_jump(e);
-		}
-		break;
-	case PLAY:
-		if (g_input&KIRBY_KEY_JUMP) kirby_jump(e);
-		break;
-	case OVER:
-		if (e->y >= SCREEN_HEIGHT) e->y = SCREEN_HEIGHT;
-		break;
-	default:
-		break;
+		case IDLE:
+			if (g_input&KIRBY_KEY_JUMP) {
+				g_gamestate=PLAY;
+				kirby_jump(e);
+			} else if (e->y > SCREEN_HEIGHT/2) {
+				kirby_jump(e);
+			}
+			break;
+		case PLAY:
+			// kirby is controllable
+			if (g_input&KIRBY_KEY_JUMP) kirby_jump(e);
+			break;
+		case OVER:
+			// kirby is uncontrollable and will bounce off the floor
+			break;
+		default:
+			break;
 	}
+
+	if (e->y >= KIRBY_MIN_HEIGHT && e->vy > 0.f) {
+		// if it exceeds the floor and still falls we swap the direction and take some energy
+		e->vy = -KIRBY_BOUNCE_COEFFICIENT*e->vy;
+	}
+	e->vy += KIRBY_GRAVITY;
+	e->y += e->vy;
+
+	if (e->y < KIRBY_MAX_HEIGHT) {
+		e->y = KIRBY_MAX_HEIGHT;
+	} 
+	if (e->y > KIRBY_MIN_HEIGHT) {
+		e->y = KIRBY_MIN_HEIGHT;
+	}
+	
 
 	// [Animation]
 	if (e->tx_data.frame < KIRBY_NO_FRAMES_ANIMATION)
