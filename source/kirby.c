@@ -3,14 +3,19 @@
 
 #include "kirby.h"
 #include <gl2d.h>
+#include <nds.h>
 
 #include "logo.h"
 #include <stdio.h>
 
 #include "tx_kirby.h"
 
-#define KIRBY_NO_SPRITES 4
+#define KIRBY_SPRITE_WIDTH 32
+#define KIRBY_SPRITE_HEIGHT KIRBY_SPRITE_WIDTH
+
+#define KIRBY_NO_SPRITES 6
 #define KIRBY_NO_FRAMES_ANIMATION 15
+
 #define KIRBY_GRAVITY .125f
 #define KIRBY_BOOST -2.6f
 
@@ -39,6 +44,8 @@ void kirby_init(entity_t *e)
 	e->y = SCREEN_HEIGHT/2;
 	e->vx = 0;
 	e->vy = 0;
+	e->rx = KIRBY_SPRITE_WIDTH/2;
+	e->ry = KIRBY_SPRITE_HEIGHT/2;
 	
 	glImage *tx = malloc(sizeof(glImage) * KIRBY_NO_SPRITES);
 	
@@ -59,11 +66,20 @@ void kirby_init(entity_t *e)
 	
 	e->tx_data.tx = tx;
 	e->tx_data.frame = 0;
+	e->tx_data.idx = 0;
+}
+
+static void kirby_jump(entity_t *e)
+{
+	e->vy = KIRBY_BOOST;
+	e->tx_data.frame = 0;
 }
 
 void kirby_update(entity_t *e)
 {
-	iprintf("\x1b[10;0Hframe = %d; %f", g_frame, e->vy);
+	iprintf("\x1b[10;0Hframe = %d; %d", g_frame, g_gamestate);
+
+	if (g_frame > 250) g_gamestate = OVER;
 
 	e->y += e->vy;
 	e->vy += KIRBY_GRAVITY;
@@ -72,17 +88,18 @@ void kirby_update(entity_t *e)
 	switch (g_gamestate)
 	{
 	case IDLE:
-		if (e->y > SCREEN_HEIGHT/2)
-		{
-			e->vy = KIRBY_BOOST;
-			e->tx_data.frame = 0;
+		if (g_input&KIRBY_KEY_JUMP) {
+			g_gamestate=PLAY;
+			kirby_jump(e);
+		} else if (e->y > SCREEN_HEIGHT/2) {
+			kirby_jump(e);
 		}
 		break;
 	case PLAY:
-		// on input jump
+		if (g_input&KIRBY_KEY_JUMP) kirby_jump(e);
 		break;
 	case OVER:
-		// Fall down
+		if (e->y >= SCREEN_HEIGHT) g_gamestate = MENU;
 		break;
 	default:
 		break;
