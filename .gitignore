@@ -2,5 +2,7 @@
 .vscode/
 build/
 
+flappy-kirby.elf
+
 notes.md
 notepad.ipynb
