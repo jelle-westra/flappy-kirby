@@ -10,6 +10,7 @@
 #include "tx_kirby.h"
 
 #define KIRBY_NO_SPRITES 4
+#define KIRBY_NO_FRAMES_ANIMATION 15
 #define KIRBY_GRAVITY .125f
 #define KIRBY_BOOST -2.6f
 
@@ -21,6 +22,14 @@ const unsigned int kirby_texcoords[] = {
 	99,0,33,32,
 	132,0,33,32,
 	165,0,33,32
+};
+
+static const uint8_t kirby_animation[KIRBY_NO_FRAMES_ANIMATION] = {
+	3,3,3,
+	4,4,4,
+	5,5,5,
+	4,4,4,
+	3,3,3
 };
 
 void kirby_init(entity_t *e)
@@ -54,21 +63,20 @@ void kirby_init(entity_t *e)
 
 void kirby_update(entity_t *e)
 {
-	iprintf("\x1b[10;0Hframe = %d; %d", g_frame, g_gamestate);
+	iprintf("\x1b[10;0Hframe = %d; %f", g_frame, e->vy);
 
 	e->y += e->vy;
 	e->vy += KIRBY_GRAVITY;
 
+	// [Logic]
 	switch (g_gamestate)
 	{
 	case IDLE:
 		if (e->y > SCREEN_HEIGHT/2)
 		{
 			e->vy = KIRBY_BOOST;
+			e->tx_data.frame = 0;
 		}
-
-		e->tx_data.frame += 1;
-		if (e->tx_data.frame > KIRBY_NO_SPRITES-1) e->tx_data.frame = 0;
 		break;
 	case PLAY:
 		// on input jump
@@ -79,6 +87,17 @@ void kirby_update(entity_t *e)
 	default:
 		break;
 	}
+
+	// [Animation]
+	if (e->tx_data.frame < KIRBY_NO_FRAMES_ANIMATION)
+	{	// jump animation
+		e->tx_data.idx = kirby_animation[e->tx_data.frame];
+	} 
+	else 
+	{	// fall animation; based on the speed kirby falls
+		e->tx_data.idx = (e->vy > 3.f) ? (e->tx_data.frame)%12/4 : (e->tx_data.frame)%24/8;
+	}
+	e->tx_data.frame += 1;
 }
 
 void kirby_destroy(entity_t *e)
