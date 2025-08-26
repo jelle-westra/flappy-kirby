@@ -13,8 +13,8 @@ void pipes_init(entity_t e[])
     // TODO : load sprite
     for (size_t i=0; i<PIPES_NO_COLS; i++)
     {
-        e[2*i    ].x = SCREEN_WIDTH + i*PIPES_OFFSET;
-        e[2*i + 1].x = SCREEN_WIDTH + i*PIPES_OFFSET;
+        e[2*i    ].x = PIPE_WIDTH + SCREEN_WIDTH + i*PIPES_OFFSET;
+        e[2*i + 1].x = PIPE_WIDTH + SCREEN_WIDTH + i*PIPES_OFFSET;
 
         // TODO : generate random heights
         e[2*i    ].y = i*10;
@@ -34,26 +34,31 @@ void pipes_init(entity_t e[])
 
 void pipes_update(entity_t e[])
 {
-    for (size_t j=0; j<PIPES_NO_ENTITIES; j++) e[j].x += e[j].vx;
-
+    
     switch (g_gamestate)
     {
-    case IDLE:
-        /* code */
-        for (size_t j=0; j<PIPES_NO_ENTITIES; j++) e[j].vx = LEVEL_SPEED_FG;
-        break;
-    case PLAY:
-        for (size_t j=0; j<PIPES_NO_ENTITIES; j++) e[j].vx = LEVEL_SPEED_FG;
-        break;
-    case OVER:
-        for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
-        {
-            e[j].vx += LEVEL_SPEED_OVER_DECELLERATION;
+        case IDLE:
+            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
+                e[j].vx = 0.f;
+            break;
+        case PLAY:
+            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
+                e[j].vx = LEVEL_SPEED_FG;
+            break;
+        case OVER:
+            for (size_t j=0; j<PIPES_NO_ENTITIES; j++) 
+                e[j].vx += LEVEL_SPEED_OVER_DECELLERATION;
+            if (e[0].vx >= 0) g_gamestate = MENU;
+            break;
+    }
+    for (size_t i=0; i<PIPES_NO_COLS; i++) {
+        e[2*i    ].x += e[2*i    ].vx;
+        e[2*i + 1].x += e[2*i + 1].vx;
+        if (e[2*i].x < -PIPE_WIDTH/2) {
+            e[2*i    ].x += PIPES_NO_COLS*PIPES_OFFSET;
+            e[2*i + 1].x += PIPES_NO_COLS*PIPES_OFFSET;
         }
-        if (e[0].vx >= 0) g_gamestate = MENU;
-        break;
-    default:
-        break;
     }
 }
+
 void pipes_destroy(entity_t e[]);
