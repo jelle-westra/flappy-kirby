@@ -8,25 +8,26 @@
 
 #include "core/state.h"
 #include "core/render.h"
+
+#include "level.h"
 #include "kirby.h"
+#include "pipes.h"
 
 glImage tx_tiles[1];
 // const unsigned int texcoords_bg[] = {
 	// 	0, 0, 256, 192,
 	// };
 	
-#define NO_PIPES 6
-#define NO_ENV 0
-#define NO_ENTITIES 1+NO_PIPES+NO_ENV
+
 	
 gamestate_t g_gamestate = IDLE;
 uint32_t g_frame = 0;
 uint32_t g_input = 0;
 
 entity_t kirby;
-entity_t pipes[NO_PIPES];
+entity_t pipes[PIPES_NO_ENTITIES];
 
-entity_t *entities[NO_ENTITIES];
+entity_t *entities[LEVEL_NO_ENITITES];
 
 
 int main(void) 
@@ -39,9 +40,13 @@ int main(void)
 
 
 	kirby_init(&kirby);
+	pipes_init(pipes);
 
+	// keeping a list of all entities such that they can be rendered together
 	entities[0] = &kirby;
-	// pipes_init(pipes, NO_PIPES);
+	for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
+		entities[j+1] = &pipes[j];
+	}
 
 	// env entities, background and foreground
 
@@ -65,17 +70,19 @@ int main(void)
 		g_frame++;
 		g_input = keysDown();
 
+		iprintf("\x1b[10;0Hframe = %d; %d; %d", g_frame, (int)pipes[0].x, (int)pipes[0].y);
+
 		// MENU is only triggered after a game over
 		if (g_gamestate != MENU) {
 			kirby_update(&kirby);
-			// pipes_update(pipes);
+			pipes_update(pipes);
 			// env_update(env);
 	
 		} else {
 			// menu_update();
 			iprintf("dit is het menu");
 		}
-		render(entities, 1);
+		render(entities, LEVEL_NO_ENITITES);
 	}
 	return 0;
 }

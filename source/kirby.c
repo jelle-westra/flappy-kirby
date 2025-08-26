@@ -46,6 +46,7 @@ void kirby_init(entity_t *e)
 	e->vy = 0;
 	e->rx = KIRBY_SPRITE_WIDTH/2;
 	e->ry = KIRBY_SPRITE_HEIGHT/2;
+	e->entity_type = ENTITY_PLAYER;
 	
 	glImage *tx = malloc(sizeof(glImage) * KIRBY_NO_SPRITES);
 	
@@ -77,8 +78,6 @@ static void kirby_jump(entity_t *e)
 
 void kirby_update(entity_t *e)
 {
-	iprintf("\x1b[10;0Hframe = %d; %d", g_frame, g_gamestate);
-
 	if (g_frame > 250) g_gamestate = OVER;
 
 	e->y += e->vy;
@@ -99,7 +98,7 @@ void kirby_update(entity_t *e)
 		if (g_input&KIRBY_KEY_JUMP) kirby_jump(e);
 		break;
 	case OVER:
-		if (e->y >= SCREEN_HEIGHT) g_gamestate = MENU;
+		if (e->y >= SCREEN_HEIGHT) e->y = SCREEN_HEIGHT;
 		break;
 	default:
 		break;
