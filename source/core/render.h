@@ -16,7 +16,7 @@ void render(entity_t *entities[], int n)
             e->x, 
             e->y, 
             GL_FLIP_NONE, 
-            &e->tx_data.tx[e->tx_data.frame]
+            &e->tx_data.tx[e->tx_data.idx]
         );
     }
     glEnd2D();
