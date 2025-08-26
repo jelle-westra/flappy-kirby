@@ -61,13 +61,20 @@ int main(void)
 
 	while(pmMainLoop()) 
 	{
+		scanKeys();
 		g_frame++;
 		g_input = keysDown();
 
-		kirby_update(&kirby);
-		// pipes_handler(pipes);
-		// env_handler(env);
-
+		// MENU is only triggered after a game over
+		if (g_gamestate != MENU) {
+			kirby_update(&kirby);
+			// pipes_update(pipes);
+			// env_update(env);
+	
+		} else {
+			// menu_update();
+			iprintf("dit is het menu");
+		}
 		render(entities, 1);
 	}
 	return 0;
