@@ -30,27 +30,6 @@ entity_t pipes[PIPES_NO_ENTITIES];
 entity_t *entities[LEVEL_NO_ENITITES];
 
 
-#include <stdbool.h>
-
-
-bool check_collision(const entity_t *kirby, const entity_t *pipe)
-{
-    // written using ChatGPT: find closest point on rect to circle center
-	float x_closest = (kirby->x < pipe->x + pipe->rx) ? 
-					((kirby->x > pipe->x - pipe->rx) ? kirby->x : pipe->x - pipe->rx) 
-					: pipe->x + pipe->rx;
-	float y_closest = (kirby->y < pipe->y + pipe->ry) ? 
-					((kirby->y > pipe->y - pipe->ry) ? kirby->y : pipe->y - pipe->ry) 
-					: pipe->y + pipe->ry;
-
-    // Distance from circle center to this point
-    float dx = kirby->x - x_closest;
-    float dy = kirby->y - y_closest;
-
-    return (dx*dx + dy*dy) <= (KIRBY_COLLIDER_RADIUS*KIRBY_COLLIDER_RADIUS);
-}
-
-
 int main(void) 
 {
 	videoSetMode(MODE_5_3D);
@@ -60,6 +39,7 @@ int main(void)
 	vramSetBankE(VRAM_E_TEX_PALETTE);
 
 
+	// initializing the entity systems
 	kirby_init(&kirby);
 	pipes_init(pipes);
 
@@ -68,20 +48,7 @@ int main(void)
 	for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
 		entities[j+1] = &pipes[j];
 	}
-
-	// env entities, background and foreground
-
-	// glLoadSpriteSet(
-	// 	tx_bg, 1, texcoords_bg,
-	// 	GL_RGB256, TEXTURE_SIZE_256, TEXTURE_SIZE_256,
-	// 	GL_TEXTURE_WRAP_S|GL_TEXTURE_WRAP_T|TEXGEN_OFF|GL_TEXTURE_COLOR0_TRANSPARENT,
-	// 	256,
-	// 	(u16*)drunkenlogoPal,
-	// 	(u8*)drunkenlogoBitmap
-	// );
-
-	
-
+	collision_init();
 
 	iprintf("Hello from Jelle 123");
 
@@ -93,7 +60,7 @@ int main(void)
 
 		iprintf("\x1b[10;0Hframe = %d; %d", g_frame, g_gamestate);
 
-		size_t pipe_collider_idx = 0;
+
 
 		// MENU is only triggered after a game over
 		if (g_gamestate != MENU) {
@@ -104,21 +71,18 @@ int main(void)
 			
 			// check collision
 			if (g_gamestate == PLAY) {
-				if (pipes[pipe_collider_idx].x < KIRBY_X-KIRBY_SPRITE_WIDTH) {
-					pipe_collider_idx = (pipe_collider_idx+2)%PIPES_NO_ENTITIES;
-				}
-				if (
-					check_collision(&kirby, &pipes[pipe_collider_idx]) ||
-					check_collision(&kirby, &pipes[pipe_collider_idx + 1])
-				) {
-					g_gamestate = OVER;
-				}
+				// will put the gamemode in OVER when kirby collides pipes
+				collision_update(&kirby, pipes);
 			}
 
-	
 		} else {
 			// menu_update();
 			iprintf("dit is het menu");
+
+			if (g_input & KIRBY_KEY_JUMP) {
+				g_gamestate = RESET;
+				// pipes_reset(pipes);
+			}
 		}
 		render(entities, LEVEL_NO_ENITITES);
 	}

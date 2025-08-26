@@ -99,6 +99,11 @@ void kirby_update(entity_t *e)
 		case OVER:
 			// kirby is uncontrollable and will bounce off the floor
 			break;
+		case RESET:
+			// rising to the IDLE state
+			if (e->y > SCREEN_HEIGHT/2) {
+				kirby_jump(e);
+			}
 		default:
 			break;
 	}

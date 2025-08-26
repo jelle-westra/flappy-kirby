@@ -7,3 +7,6 @@
 #define LEVEL_SPEED_OVER_DECELLERATION 0.005f
 
 #define LEVEL_NO_ENITITES 1+PIPES_NO_ENTITIES+ENV_NO_ENTITIES
+
+void collision_init();
+void collision_update(entity_t *kirby, entity_t pipes[]);

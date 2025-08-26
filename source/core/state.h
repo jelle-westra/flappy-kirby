@@ -1,7 +1,7 @@
 #pragma once
 #include <stdint.h>
 
-typedef enum { IDLE, PLAY, OVER, MENU } gamestate_t;
+typedef enum { IDLE, PLAY, OVER, MENU, RESET } gamestate_t;
 
 extern gamestate_t g_gamestate;
 extern uint32_t g_frame;
