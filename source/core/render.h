@@ -13,8 +13,8 @@ void render(entity_t *entities[], int n)
     {
         e = entities[i];
         glSprite(
-            e->x, 
-            e->y, 
+            (int)(e->x - e->rx), 
+            (int)(e->y - e->ry), 
             GL_FLIP_NONE, 
             &e->tx_data.tx[e->tx_data.idx]
         );

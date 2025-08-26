@@ -4,6 +4,5 @@
 typedef struct
 {
     glImage *tx;
-	uint8_t frame;
-	uint8_t idx;
+	uint8_t frame, idx;
 } tx_data_t;

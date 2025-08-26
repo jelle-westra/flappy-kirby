@@ -12,7 +12,9 @@ typedef enum
 
 typedef struct
 {
-    float x, y, vx, vy;
+    float x, y;   // position (center)
+    float vx, vy; // velocity
+    float rx, ry; // radius
     bool active;
     entity_type_t entity_type;
     tx_data_t tx_data;
