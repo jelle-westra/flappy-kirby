@@ -8,5 +8,9 @@
 
 #define LEVEL_NO_ENITITES 1+PIPES_NO_ENTITIES+ENV_NO_ENTITIES
 
-void collision_init();
-void collision_update(entity_t *kirby, entity_t pipes[]);
+static size_t __pipe_collider_idx;
+static int __score;
+
+void level_init();
+void level_reset();
+void level_update(entity_t *kirby, entity_t pipes[]);

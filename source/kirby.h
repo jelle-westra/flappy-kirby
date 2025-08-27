@@ -10,7 +10,6 @@
 #define KIRBY_COLLIDER_MARGIN_FACTOR 0.95f
 #define KIRBY_COLLIDER_RADIUS (KIRBY_COLLIDER_MARGIN_FACTOR*KIRBY_SPRITE_WIDTH/2)
 
-
 void kirby_init(entity_t *e);
 void kirby_update(entity_t *e);
 void kirby_destroy(entity_t *e);

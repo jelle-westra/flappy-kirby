@@ -19,11 +19,6 @@ glImage tx_tiles[1];
 	// };
 	
 
-	
-gamestate_t g_gamestate = IDLE;
-uint32_t g_frame = 0;
-uint32_t g_input = 0;
-
 entity_t kirby;
 entity_t pipes[PIPES_NO_ENTITIES];
 
@@ -44,11 +39,13 @@ int main(void)
 	pipes_init(pipes);
 
 	// keeping a list of all entities such that they can be rendered together
-	entities[0] = &kirby;
 	for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
-		entities[j+1] = &pipes[j];
+		entities[j] = &pipes[j];
 	}
-	collision_init();
+	entities[PIPES_NO_ENTITIES] = &kirby;
+
+	state_init();
+	level_init();
 
 	iprintf("Hello from Jelle 123");
 
@@ -58,33 +55,34 @@ int main(void)
 		g_frame++;
 		g_input = keysDown();
 
-		iprintf("\x1b[10;0Hframe = %d; %d", g_frame, g_gamestate);
-
-
+		iprintf("\x1b[10;0Hframe = %d; %d", g_frame);
 
 		// MENU is only triggered after a game over
 		if (g_gamestate != MENU) {
 			// update entities
 			kirby_update(&kirby);
-			pipes_update(pipes);
+			pipes_update(&pipes[0]);
 			// env_update(env);
 			
 			// check collision
 			if (g_gamestate == PLAY) {
 				// will put the gamemode in OVER when kirby collides pipes
-				collision_update(&kirby, pipes);
+				level_update(&kirby, pipes);
 			}
 
 		} else {
 			// menu_update();
-			iprintf("dit is het menu");
+			// iprintf("dit is het menu");
 
 			if (g_input & KIRBY_KEY_JUMP) {
-				g_gamestate = RESET;
+				state_reset();
+				level_reset();
 				// pipes_reset(pipes);
 			}
 		}
 		render(entities, LEVEL_NO_ENITITES);
 	}
+	kirby_destroy(&kirby);
+	pipes_destroy(pipes);
 	return 0;
 }

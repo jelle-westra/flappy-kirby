@@ -111,6 +111,7 @@ void kirby_update(entity_t *e)
 	if (e->y >= KIRBY_MIN_HEIGHT && e->vy > 0.f) {
 		// if it exceeds the floor and still falls we swap the direction and take some energy
 		e->vy = -KIRBY_BOUNCE_COEFFICIENT*e->vy;
+		e->tx_data.frame = 0;
 	}
 	e->vy += KIRBY_GRAVITY;
 	e->y += e->vy;
