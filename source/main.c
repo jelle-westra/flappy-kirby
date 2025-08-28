@@ -2,10 +2,6 @@
 #include <stdio.h>
 #include <gl2d.h>
 
-
-// #include "tiles.h"
-// #include "logo.h"
-
 #include "core/state.h"
 #include "core/render.h"
 
@@ -13,76 +9,67 @@
 #include "kirby.h"
 #include "pipes.h"
 
-glImage tx_tiles[1];
-// const unsigned int texcoords_bg[] = {
-	// 	0, 0, 256, 192,
-	// };
-	
-
 entity_t kirby;
 entity_t pipes[PIPES_NO_ENTITIES];
+entity_t env[ENV_NO_ENTITIES];
 
 entity_t *entities[LEVEL_NO_ENITITES];
 
-
 int main(void) 
 {
+	// initialize video and console
 	videoSetMode(MODE_5_3D);
 	consoleDemoInit();	
 	glScreen2D();
 	vramSetBankA(VRAM_A_TEXTURE);
 	vramSetBankE(VRAM_E_TEX_PALETTE);
 
-
 	// initializing the entity systems
 	kirby_init(&kirby);
-	pipes_init(pipes);
+	pipes_init(&pipes[0]);
+	env_init(&env[0]);
 
 	// keeping a list of all entities such that they can be rendered together
-	for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
-		entities[j] = &pipes[j];
+	for (size_t i=0; i<ENV_NO_ENTITIES; i++) {
+		entities[i] = &env[i];
 	}
-	entities[PIPES_NO_ENTITIES] = &kirby;
+	for (size_t i=0; i<PIPES_NO_ENTITIES; i++) {
+		entities[ENV_NO_ENTITIES + i] = &pipes[i];
+	}
+	entities[PIPES_NO_ENTITIES + ENV_NO_ENTITIES] = &kirby;
 
 	state_init();
 	level_init();
-
-	iprintf("Hello from Jelle 123");
+	render_init();
 
 	while(pmMainLoop()) 
 	{
-		scanKeys();
-		g_frame++;
-		g_input = keysDown();
-
+		state_update();
 		iprintf("\x1b[10;0Hframe = %d; %d", g_frame);
 
 		// MENU is only triggered after a game over
 		if (g_gamestate != MENU) {
-			// update entities
+			// update entities physics and animation
 			kirby_update(&kirby);
 			pipes_update(&pipes[0]);
-			// env_update(env);
-			
-			// check collision
-			if (g_gamestate == PLAY) {
-				// will put the gamemode in OVER when kirby collides pipes
-				level_update(&kirby, pipes);
-			}
+			env_update(&env[0]);
+
+			// update game logic (collision check is done in level_update)
+			level_update(&kirby, &pipes[0]);
 
 		} else {
 			// menu_update();
 			// iprintf("dit is het menu");
 
+			// wainting for jump to start the game
 			if (g_input & KIRBY_KEY_JUMP) {
 				state_reset();
 				level_reset();
-				// pipes_reset(pipes);
 			}
 		}
 		render(entities, LEVEL_NO_ENITITES);
 	}
 	kirby_destroy(&kirby);
-	pipes_destroy(pipes);
+	pipes_destroy(&pipes[0]);
 	return 0;
 }

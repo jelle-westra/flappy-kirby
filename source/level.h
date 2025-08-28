@@ -8,8 +8,7 @@
 
 #define LEVEL_NO_ENITITES 1+PIPES_NO_ENTITIES+ENV_NO_ENTITIES
 
-static size_t __pipe_collider_idx;
-static int __score;
+extern int hit_timeout;
 
 void level_init();
 void level_reset();

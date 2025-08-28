@@ -1,12 +1,14 @@
 #include "core/state.h"
 #include "core/entity.h"
 #include "level.h"
+#include "sprites.h"
 #include "pipes.h"
 
-#define PIPES_GAP 128
-#define PIPES_GAP 256
-#define PIPE_WIDTH 32
-#define PIPE_HEIGHT 64
+#define PIPES_GAP 64
+#define PIPE_WIDTH 32.f
+#define PIPE_HEIGHT 128.f
+
+#define PIPE_HEIGHT_HALF (PIPE_HEIGHT/2.f)
 
 void pipes_init(entity_t *e)
 {
@@ -17,18 +19,23 @@ void pipes_init(entity_t *e)
         e[2*i + 1].x = PIPE_WIDTH + SCREEN_WIDTH + i*PIPES_OFFSET;
 
         // TODO : generate random heights
-        e[2*i    ].y = i*10;
-        e[2*i + 1].y = i*10 + PIPES_GAP;
+        e[2*i    ].y = i*10 + PIPE_HEIGHT;
+        e[2*i + 1].y = i*10 + PIPE_HEIGHT;
         // TODO : attach sprite
+        e[2*i + 1].tx_data.flip_mode = GL_FLIP_H;
     }
     for (size_t j=0; j<PIPES_NO_ENTITIES; j++)
     {
         e[j].active = true;
         e[j].entity_type = ENTITY_PIPE;
-        e[j].rx = PIPE_WIDTH/2;
-        e[j].ry = PIPE_HEIGHT/2;
+        e[j].rx = PIPE_WIDTH/2.f;
+        e[j].ry = PIPE_HEIGHT/2.f;
         e[j].vx = LEVEL_SPEED_FG;
         e[j].vy = 0.f;
+        
+        e[j].tx_data.tx = sprites_load_pipes();
+        e[j].tx_data.frame = 0;
+        e[j].tx_data.idx = 0;
     }
 }
 
@@ -48,6 +55,8 @@ void pipes_update(entity_t *e)
                     e[j].x += PIPES_NO_COLS*PIPES_OFFSET;
                 }
             }
+            break;
+        case HIT:
             break;
         case OVER:
             for (size_t j=0; j<PIPES_NO_ENTITIES; j++) {
@@ -77,8 +86,8 @@ void pipes_update(entity_t *e)
                     e[2*i + 1].x = PIPE_WIDTH + SCREEN_WIDTH + i*PIPES_OFFSET;
 
                     // TODO : generate random heights
-                    e[2*i    ].y = i*10;
-                    e[2*i + 1].y = i*10 + PIPES_GAP;
+                    e[2*i    ].y = i*10 - PIPE_HEIGHT_HALF;
+                    e[2*i + 1].y = i*10 + PIPES_GAP + PIPE_HEIGHT_HALF;
 
                     e[2*i    ].vy = 0;
                     e[2*i + 1].vy = 0;
@@ -88,7 +97,7 @@ void pipes_update(entity_t *e)
     }
 }
 
-void pipes_reset(entity_t *e)
+static void pipes_reset(entity_t *e)
 {
     for (size_t j=0; j<PIPES_NO_ENTITIES; j++)
     {

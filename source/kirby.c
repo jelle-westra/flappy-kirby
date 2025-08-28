@@ -1,12 +1,10 @@
 #include "core/state.h"
 #include "core/entity.h"
+#include "sprites.h"
 
 #include "kirby.h"
 #include <gl2d.h>
 #include <nds.h>
-
-#include "logo.h"
-#include <stdio.h>
 
 #include "tx_kirby.h"
 
@@ -51,24 +49,24 @@ void kirby_init(entity_t *e)
 	e->ry = KIRBY_SPRITE_HEIGHT/2;
 	e->entity_type = ENTITY_PLAYER;
 	
-	glImage *tx = malloc(sizeof(glImage) * KIRBY_NO_SPRITES);
+	// glImage *tx = malloc(sizeof(glImage) * KIRBY_NO_SPRITES);
 	
-	glLoadTileSet( 
-		tx,
-		33,
-		32,
-		256,
-		32,
-		GL_RGB16,
-		TEXTURE_SIZE_256,
-		TEXTURE_SIZE_32,
-		GL_TEXTURE_WRAP_S|GL_TEXTURE_WRAP_T|TEXGEN_OFF|GL_TEXTURE_COLOR0_TRANSPARENT,
-		16,		// Just use 0 if palette is not in use
-		(u16*)tx_kirbyPal,		// Just use 0 if palette is not in use
-		(u8*)tx_kirbyBitmap
-	);
+	// glLoadTileSet( 
+	// 	tx,
+	// 	33,
+	// 	32,
+	// 	256,
+	// 	32,
+	// 	GL_RGB16,
+	// 	TEXTURE_SIZE_256,
+	// 	TEXTURE_SIZE_32,
+	// 	GL_TEXTURE_WRAP_S|GL_TEXTURE_WRAP_T|TEXGEN_OFF|GL_TEXTURE_COLOR0_TRANSPARENT,
+	// 	16,		// Just use 0 if palette is not in use
+	// 	(u16*)tx_kirbyPal,		// Just use 0 if palette is not in use
+	// 	(u8*)tx_kirbyBitmap
+	// );
 	
-	e->tx_data.tx = tx;
+	e->tx_data.tx = sprites_load_kirby();
 	e->tx_data.frame = 0;
 	e->tx_data.idx = 0;
 }
@@ -96,6 +94,8 @@ void kirby_update(entity_t *e)
 			// kirby is controllable
 			if (g_input&KIRBY_KEY_JUMP) kirby_jump(e);
 			break;
+		case HIT:
+			break;
 		case OVER:
 			// kirby is uncontrollable and will bounce off the floor
 			break;
@@ -107,33 +107,33 @@ void kirby_update(entity_t *e)
 		default:
 			break;
 	}
+	if (g_gamestate != HIT) {
+		if (e->y >= KIRBY_MIN_HEIGHT && e->vy > 0.f) {
+			// if it exceeds the floor and still falls we swap the direction and take some energy
+			e->vy = -KIRBY_BOUNCE_COEFFICIENT*e->vy;
+			e->tx_data.frame = 0;
+		}
+		e->vy += KIRBY_GRAVITY;
+		e->y += e->vy;
 
-	if (e->y >= KIRBY_MIN_HEIGHT && e->vy > 0.f) {
-		// if it exceeds the floor and still falls we swap the direction and take some energy
-		e->vy = -KIRBY_BOUNCE_COEFFICIENT*e->vy;
-		e->tx_data.frame = 0;
+		if (e->y < KIRBY_MAX_HEIGHT) {
+			e->y = KIRBY_MAX_HEIGHT;
+		} 
+		if (e->y > KIRBY_MIN_HEIGHT) {
+			e->y = KIRBY_MIN_HEIGHT;
+		}
+		
+		// [Animation]
+		if (e->tx_data.frame < KIRBY_NO_FRAMES_ANIMATION)
+		{	// jump animation
+			e->tx_data.idx = kirby_animation[e->tx_data.frame];
+		} 
+		else 
+		{	// fall animation; based on the speed kirby falls
+			e->tx_data.idx = (e->vy > 3.f) ? (e->tx_data.frame)%12/4 : (e->tx_data.frame)%24/8;
+		}
+		e->tx_data.frame += 1;
 	}
-	e->vy += KIRBY_GRAVITY;
-	e->y += e->vy;
-
-	if (e->y < KIRBY_MAX_HEIGHT) {
-		e->y = KIRBY_MAX_HEIGHT;
-	} 
-	if (e->y > KIRBY_MIN_HEIGHT) {
-		e->y = KIRBY_MIN_HEIGHT;
-	}
-	
-
-	// [Animation]
-	if (e->tx_data.frame < KIRBY_NO_FRAMES_ANIMATION)
-	{	// jump animation
-		e->tx_data.idx = kirby_animation[e->tx_data.frame];
-	} 
-	else 
-	{	// fall animation; based on the speed kirby falls
-		e->tx_data.idx = (e->vy > 3.f) ? (e->tx_data.frame)%12/4 : (e->tx_data.frame)%24/8;
-	}
-	e->tx_data.frame += 1;
 }
 
 void kirby_destroy(entity_t *e)

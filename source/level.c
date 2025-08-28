@@ -4,6 +4,8 @@
 
 #include <stdio.h>
 
+int hit_timeout;
+
 static size_t __pipe_collider_idx;
 static int __score;
 
@@ -16,6 +18,7 @@ void level_reset()
 {
     __pipe_collider_idx = 0;
     __score = 0;
+    hit_timeout = 0;
 }
 
 static bool __collision_check(const entity_t *kirby, const entity_t *pipe)
@@ -37,19 +40,35 @@ static bool __collision_check(const entity_t *kirby, const entity_t *pipe)
 
 void level_update(entity_t *kirby, entity_t pipes[])
 {
-    if (pipes[__pipe_collider_idx].x < kirby->x-KIRBY_SPRITE_WIDTH) {
-        // __pipe_collider_idx = (__pipe_collider_idx+2)%PIPES_NO_ENTITIES;
-        __pipe_collider_idx += 2;
-        if (__pipe_collider_idx >= PIPES_NO_ENTITIES) {
-            __pipe_collider_idx = 0;
+    switch (g_gamestate)
+    {
+    case IDLE:
+        break;
+    case PLAY:
+        if (pipes[__pipe_collider_idx].x < kirby->x-KIRBY_SPRITE_WIDTH) {
+            // __pipe_collider_idx = (__pipe_collider_idx+2)%PIPES_NO_ENTITIES;
+            __pipe_collider_idx += 2;
+            if (__pipe_collider_idx >= PIPES_NO_ENTITIES) {
+                __pipe_collider_idx = 0;
+            }
+            __score++;
+            iprintf("score: %d", __score);
         }
-        __score++;
-        iprintf("score: %d", __score);
-    }
-    if (
-        __collision_check(kirby, &pipes[__pipe_collider_idx]) ||
-        __collision_check(kirby, &pipes[__pipe_collider_idx + 1])
-    ) {
-        g_gamestate = OVER;
+        if (
+            __collision_check(kirby, &pipes[__pipe_collider_idx]) ||
+            __collision_check(kirby, &pipes[__pipe_collider_idx + 1])
+        ) {
+            // TODO : set color palettes
+            g_gamestate = HIT;
+        }
+        break;
+        case HIT:
+        // TODO : set color palettes
+        if (hit_timeout++ > 10) {
+            g_gamestate = OVER;
+        }
+        break;
+    default:
+        break;
     }
 }

@@ -1,10 +1,8 @@
 #pragma once
 #include "core/entity.h"
-#include "level.h"
 
-#define ENV_NO_ENTITIES 0
+#define ENV_NO_ENTITIES 2
 
-void env_handler(entity_t *e);
-// {
-//     e->x -= (e->entity_type == ENTITY_FG) ? LEVEL_SPEED_FG : LEVEL_SPEED_BG;
-// }
+void env_init(entity_t *e);
+void env_update(entity_t *e);
+void env_destroy(entity_t *e);
