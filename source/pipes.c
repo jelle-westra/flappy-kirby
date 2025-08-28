@@ -34,8 +34,8 @@ void pipes_init(entity_t *e)
         e[j].vy = 0.f;
         
         e[j].tx_data.tx = sprites_load_pipes();
-        e[j].tx_data.frame = 0;
-        e[j].tx_data.idx = 0;
+        e[j].tx_data.rotation = TX_ROT_90;
+        e[j].tx_data.idx = 1;
     }
 }
 

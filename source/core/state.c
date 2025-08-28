@@ -4,7 +4,6 @@
 gamestate_t g_gamestate;
 uint32_t g_frame;
 uint32_t g_input;
-uint32_t g_score;
 
 void state_init()
 {

@@ -8,20 +8,28 @@
 #define SPRITES_FG_NO_SPRITES 1
 #define SPRITES_BG_NO_SPRITES 1
 #define SPRITES_PIPE_NO_SPRITES 2
+#define SPRITES_SCOREBOARD_NO_SPRITES 10
 
-#define SPRITES_ENV_NO_SPRITES (SPRITES_FG_NO_SPRITES + SPRITES_BG_NO_SPRITES + SPRITES_PIPE_NO_SPRITES)
+#define SPRITES_ENV_NO_SPRITES (SPRITES_FG_NO_SPRITES + SPRITES_BG_NO_SPRITES + SPRITES_PIPE_NO_SPRITES + SPRITES_SCOREBOARD_NO_SPRITES)
 
 static glImage __sprites_kirby[SPRITES_KIRBY_NO_SPRITES];
 static bool __sprites_kirby_loaded = false;
-
-int sprites_kirby_id = 0;
-
 
 static const unsigned int __sprites_texcoords_env[] = {
     0, 192, SPRITES_FG_WIDTH, SPRITES_FG_HEIGHT, // foreground
     0, 0, SPRITES_BG_WIDTH, SPRITES_BG_HEIGHT, // background
     0, 160, 128, 32, // pipe 1
     128, 160, 128, 32, // pipe 2
+    0, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [0] 
+    8, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [1]
+    16, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [2]
+    24, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [3]
+    32, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [4]
+    40, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [5]
+    48, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [6]
+    56, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [7]
+    64, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [8]
+    72, 224, SPRITES_SCOREBOARD_WIDTH, SPRITES_SCOREBOARD_HEIGHT, // [9]
 };
 
 static glImage __sprites__env[SPRITES_ENV_NO_SPRITES];
@@ -30,17 +38,17 @@ static bool __sprites_env_loaded = false;
 glImage *sprites_load_kirby()
 {
     if (!__sprites_kirby_loaded) {
-        sprites_kirby_id = glLoadTileSet( 
+        glLoadTileSet( 
             __sprites_kirby,
             33,
             32,
             256,
             32,
-            GL_RGB16,
+            GL_RGB256,
             TEXTURE_SIZE_256,
             TEXTURE_SIZE_32,
             GL_TEXTURE_WRAP_S|GL_TEXTURE_WRAP_T|TEXGEN_OFF|GL_TEXTURE_COLOR0_TRANSPARENT,
-            16,		// Just use 0 if palette is not in use
+            256,		// Just use 0 if palette is not in use
             (u16*)tx_kirbyPal,		// Just use 0 if palette is not in use
             (u8*)tx_kirbyBitmap
         );
@@ -78,4 +86,10 @@ glImage *sprites_load_pipes()
 {
     __sprites_load_env();
     return (__sprites__env + SPRITES_FG_NO_SPRITES + SPRITES_BG_NO_SPRITES);
+}
+
+glImage *sprites_load_scoreboard()
+{
+    __sprites_load_env();
+    return (__sprites__env + SPRITES_FG_NO_SPRITES + SPRITES_BG_NO_SPRITES + SPRITES_PIPE_NO_SPRITES);
 }

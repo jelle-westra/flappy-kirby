@@ -37,24 +37,16 @@ void render(entity_t *entities[], int n)
     {
         e = entities[i];
 
-        if ((g_gamestate == HIT) && (e->entity_type == ENTITY_PIPE)) {
-            int color = (g_frame*2) & 31;
+        if ((g_gamestate == HIT) && ((e->entity_type == ENTITY_BG)||(e->entity_type == ENTITY_FG))) {
+            int color = (hit_timeout) & 31;
 			glColor( RGB15(color, color, color) );
+        }
+        if ((g_gamestate == HIT) && ((e->entity_type == ENTITY_PLAYER)||(e->entity_type == ENTITY_PIPE))) {
+			glColor( RGB15(31,31,31) );
         } 
-
-
-        if ((g_gamestate == HIT) && (e->entity_type == ENTITY_BG)) {
-            if (hit_timeout < 5) {
-                e->tx_data.u += LEVEL_SPEED_BG;
-            } else {
-                e->tx_data.u -= LEVEL_SPEED_BG;
-            }
-        };
-        // if ((g_gamestate == HIT) && (e->entity_type == ENTITY_FG)) continue;
-
         
         if (e->active) {
-            if (e->entity_type == ENTITY_PIPE) {
+            if (e->tx_data.rotation) {
                 glSpriteOnQuad(
                     (int)(e->x - e->rx), (int)(e->y + e->ry),
                     (int)(e->x + e->rx), (int)(e->y + e->ry), 
@@ -64,17 +56,17 @@ void render(entity_t *entities[], int n)
                     e->tx_data.flip_mode, 
                     &e->tx_data.tx[e->tx_data.idx]
                 );
-                continue;
-            } 
-            glSpriteOnQuad(
-                (int)(e->x - e->rx), (int)(e->y - e->ry),
-                (int)(e->x - e->rx), (int)(e->y + e->ry), 
-                (int)(e->x + e->rx), (int)(e->y + e->ry), 
-                (int)(e->x + e->rx), (int)(e->y - e->ry), 
-                (int)e->tx_data.u, (int)e->tx_data.v,
-                e->tx_data.flip_mode, 
-                &e->tx_data.tx[e->tx_data.idx]
-            );
+            } else {
+                glSpriteOnQuad(
+                    (int)(e->x - e->rx), (int)(e->y - e->ry),
+                    (int)(e->x - e->rx), (int)(e->y + e->ry), 
+                    (int)(e->x + e->rx), (int)(e->y + e->ry), 
+                    (int)(e->x + e->rx), (int)(e->y - e->ry), 
+                    (int)e->tx_data.u, (int)e->tx_data.v,
+                    e->tx_data.flip_mode, 
+                    &e->tx_data.tx[e->tx_data.idx]
+                );
+            }
         }
     }
     glEnd2D();

@@ -18,7 +18,7 @@
 #define KIRBY_BOUNCE_COEFFICIENT 0.6f
 
 #define KIRBY_MAX_HEIGHT 0.f
-#define KIRBY_MIN_HEIGHT SCREEN_HEIGHT - KIRBY_SPRITE_HEIGHT
+#define KIRBY_MIN_HEIGHT SCREEN_HEIGHT - 40
 
 // u, v, width, height
 const unsigned int kirby_texcoords[] = {

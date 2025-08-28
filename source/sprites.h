@@ -10,9 +10,11 @@
 #define SPRITES_PIPE_WIDTH 128
 #define SPRITES_PIPE_HEIGHT 32
 
-extern int sprites_kirby_id;
+#define SPRITES_SCOREBOARD_WIDTH 8
+#define SPRITES_SCOREBOARD_HEIGHT 11
 
 glImage* sprites_load_kirby();
 glImage* sprites_load_pipes();
 glImage* sprites_load_bg();
 glImage* sprites_load_fg();
+glImage* sprites_load_scoreboard();
