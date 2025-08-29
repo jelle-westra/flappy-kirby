@@ -1,44 +1,23 @@
-#pragma once
+#include "render.h"
+
+#include "core/state.h"
 #include "entity.h"
-#include "sprites.h"
-#include "tx_kirby.h"
 #include "level.h"
 
+#include <nds.h>
 #include <gl2d.h>
 
-static int PaletteID;
-static int OriginalPaletteID;
-// Make an all-white palette for stencil effects
-
-void render_init()
-{
-    unsigned short hitPal[256];
-    for(int i = 0; i < 256; i++ )
-    {
-        hitPal[i] = (0xFF << 8 ) | 0xFF;
-    }
-    
-    glGenTextures(1, &PaletteID);
-    glBindTexture(0, PaletteID);
-    glColorTableEXT(0,0,256,0,0,hitPal);
-
-    glGenTextures(1, &OriginalPaletteID);
-    glBindTexture(0, OriginalPaletteID);
-    glColorTableEXT(0,0,256,0,0,tx_kirbyPal);
-}
-
-
-void render(entity_t *entities[], int n)
+void render(entity_t *entities[])
 {
     glBegin2D();
 
     entity_t *e;
-    for (int i=0; i<n; i++)
+    for (int i=0; i<LEVEL_NO_ENITITES; i++)
     {
         e = entities[i];
 
         if ((g_gamestate == HIT) && ((e->entity_type == ENTITY_BG)||(e->entity_type == ENTITY_FG))) {
-            int color = (hit_timeout) & 31;
+            int color = (e->tx_data.frame) & 31;
 			glColor( RGB15(color, color, color) );
         }
         if ((g_gamestate == HIT) && ((e->entity_type == ENTITY_PLAYER)||(e->entity_type == ENTITY_PIPE))) {

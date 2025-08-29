@@ -49,18 +49,20 @@ void env_update(entity_t *e)
             e[i].vx = __SPEED;
             break;
         case HIT:
+            e[i].tx_data.frame++;
             break;
-        case OVER:
+            case OVER:
             e[i].vx += LEVEL_SPEED_OVER_DECELLERATION;
             if (e[i].vx > 0.f) {
                 e[i].vx = 0.f; 
             }
             break;
-        case RESET:
+            case RESET:
             e[i].vx -= LEVEL_SPEED_OVER_DECELLERATION * __DECELL_FAC;
             if (e[i].vx < __SPEED) {
                 e[i].vx = __SPEED; 
             }
+            e[i].tx_data.frame = 0;
         default:
             break;
         }

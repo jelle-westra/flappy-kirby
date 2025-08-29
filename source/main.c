@@ -2,13 +2,15 @@
 #include <stdio.h>
 #include <gl2d.h>
 
+#include "core/entity.h"
 #include "core/state.h"
-#include "core/render.h"
 
-#include "level.h"
 #include "kirby.h"
 #include "pipes.h"
 #include "scoreboard.h"
+
+#include "level.h"
+#include "render.h"
 
 entity_t kirby;
 entity_t pipes[PIPES_NO_ENTITIES];
@@ -20,7 +22,7 @@ entity_t *entities[LEVEL_NO_ENITITES];
 int main(void) 
 {
 	// initialize video and console
-	videoSetMode(MODE_5_3D);
+	videoSetMode(MODE_4_3D);
 	consoleDemoInit();	
 	glScreen2D();
 	vramSetBankA(VRAM_A_TEXTURE);
@@ -46,14 +48,10 @@ int main(void)
 
 	state_init();
 	level_init();
-	render_init();
 
 	while(pmMainLoop()) 
 	{
 		state_update();
-		iprintf("\x1b[10;0Hframe = %d; %d", g_frame);
-
-		// MENU is only triggered after a game over
 		if (g_gamestate != MENU) {
 			// update entities physics and animation
 			kirby_update(&kirby);
@@ -62,11 +60,7 @@ int main(void)
 
 			// update game logic (collision check is done in level_update)
 			level_update(&kirby, &pipes[0], &scoreboard[0]);
-
 		} else {
-			// menu_update();
-			// iprintf("dit is het menu");
-
 			// wainting for jump to start the game
 			if (g_input & KIRBY_KEY_JUMP) {
 				state_reset();
@@ -74,7 +68,7 @@ int main(void)
 				scoreboard_reset(&scoreboard[0]);
 			}
 		}
-		render(entities, LEVEL_NO_ENITITES);
+		render(entities);
 	}
 	kirby_destroy(&kirby);
 	pipes_destroy(&pipes[0]);

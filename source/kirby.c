@@ -49,23 +49,6 @@ void kirby_init(entity_t *e)
 	e->ry = KIRBY_SPRITE_HEIGHT/2;
 	e->entity_type = ENTITY_PLAYER;
 	
-	// glImage *tx = malloc(sizeof(glImage) * KIRBY_NO_SPRITES);
-	
-	// glLoadTileSet( 
-	// 	tx,
-	// 	33,
-	// 	32,
-	// 	256,
-	// 	32,
-	// 	GL_RGB16,
-	// 	TEXTURE_SIZE_256,
-	// 	TEXTURE_SIZE_32,
-	// 	GL_TEXTURE_WRAP_S|GL_TEXTURE_WRAP_T|TEXGEN_OFF|GL_TEXTURE_COLOR0_TRANSPARENT,
-	// 	16,		// Just use 0 if palette is not in use
-	// 	(u16*)tx_kirbyPal,		// Just use 0 if palette is not in use
-	// 	(u8*)tx_kirbyBitmap
-	// );
-	
 	e->tx_data.tx = sprites_load_kirby();
 	e->tx_data.frame = 0;
 	e->tx_data.idx = 0;
@@ -132,7 +115,7 @@ void kirby_update(entity_t *e)
 		{	// fall animation; based on the speed kirby falls
 			e->tx_data.idx = (e->vy > 3.f) ? (e->tx_data.frame)%12/4 : (e->tx_data.frame)%24/8;
 		}
-		e->tx_data.frame += 1;
+		e->tx_data.frame++;
 	}
 }
 
